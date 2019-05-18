@@ -54,7 +54,7 @@ class UI {
   }
 
   deleteBook(target) {
-      console.log(target);
+    // console.log(target);
     if (target.className === "fa fa-times")
       target.parentElement.parentElement.parentElement.remove();
   }
@@ -65,6 +65,57 @@ class UI {
     document.querySelector("#isbn").value = "";
   }
 }
+
+class Store {
+  static addBook(book) {
+    const books = Store.getBooks();
+
+    books.push(book);
+
+    localStorage.setItem("books", JSON.stringify(books));
+  }
+
+  static getBooks() {
+    let books;
+    if (localStorage.getItem("books") === null) {
+      books = [];
+    } else {
+      books = JSON.parse(localStorage.getItem("books"));
+    }
+
+    return books;
+  }
+
+  static displayBooks() {
+    const books = Store.getBooks();
+
+    // console.log(books);
+
+    books.forEach(function(book) {
+      const ui = new UI();
+
+      //   Add book to the UI
+      ui.addBookToList(book);
+    });
+  }
+
+  static removeBook(isbn) {
+    const books = Store.getBooks();
+
+    // console.log(books);
+
+    books.forEach(function(book, index) {
+        if(book.isbn === isbn)
+            books.splice(index, 1);
+    });    
+
+    localStorage.setItem('books', JSON.stringify(books));
+
+  }
+}
+
+// DOM Load Event
+document.addEventListener("DOMContentLoaded", Store.displayBooks);
 
 // Event Listeners for the Add book
 document.querySelector("#book-form").addEventListener("submit", function(e) {
@@ -90,11 +141,17 @@ document.querySelector("#book-form").addEventListener("submit", function(e) {
     // Add book to the list
     ui.addBookToList(book);
 
+    // Add Book to the LS
+    Store.addBook(book);
+
     // Success Alert
     ui.showAlert("Book Added Successfully", "success");
 
     // Clear the fields
     ui.clearFields();
+
+    // Focus the Title Field
+    document.querySelector("#title").focus();
   }
 
   e.preventDefault();
@@ -106,6 +163,13 @@ document.querySelector("#book-list").addEventListener("click", function(e) {
 
   // Delete Book
   ui.deleteBook(e.target);
+
+  // Remove Book from the LS
+  Store.removeBook(
+    e.target.parentElement.parentElement.previousElementSibling.textContent
+  );
+
+  // console.log(e.target.parentElement.parentElement.previousElementSibling.textContent);
 
   // Show Success - Alert
   ui.showAlert("Book Removed", "success");
