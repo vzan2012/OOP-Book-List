@@ -16,3 +16,7 @@
 .error {
     background: red;
 }
+
+.delete i {
+  color: #333;
+}
