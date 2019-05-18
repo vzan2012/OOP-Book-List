@@ -26,7 +26,7 @@ UI.prototype.addBookToList = function(book) {
     <td><a href="" class="delete">X</a></td>
   `;
 
-  console.log(row);
+  // console.log(row);
 
   // Append the row to the list
   list.appendChild(row);
@@ -44,18 +44,24 @@ UI.prototype.showAlert = function(message, className) {
   div.appendChild(document.createTextNode(message));
 
   // Get the parent
-  const container = document.querySelector('.container');
+  const container = document.querySelector(".container");
 
   // Get the form
-  const form = document.querySelector('#book-form');
+  const form = document.querySelector("#book-form");
 
   // Insert the Alert
   container.insertBefore(div, form);
 
   // Timeout func to clear the alert
-  setTimeout(function(){
-    document.querySelector('.alert').remove();
+  setTimeout(function() {
+    document.querySelector(".alert").remove();
   }, 3000);
+};
+
+// Delete Books
+UI.prototype.deleteBook = function(target) {
+  if (target.className === "delete")
+    target.parentElement.parentElement.remove();
 };
 
 // Clear the Fields
@@ -65,8 +71,8 @@ UI.prototype.clearFields = function() {
   document.querySelector("#isbn").value = "";
 };
 
-// Event Listeners
-document.querySelector('#book-form').addEventListener('submit', function(e) {
+// Event Listeners for the Add book
+document.querySelector("#book-form").addEventListener("submit", function(e) {
   // Getting the form values
   const title = document.querySelector("#title").value,
     author = document.querySelector("#author").value,
@@ -80,6 +86,8 @@ document.querySelector('#book-form').addEventListener('submit', function(e) {
   // Instantiate UI Object
   const ui = new UI();
 
+  // console.log(ui);
+
   // Validate the fields
   if (title === "" || author === "" || isbn === "") {
     ui.showAlert("Please fill in all the fields", "error");
@@ -88,11 +96,24 @@ document.querySelector('#book-form').addEventListener('submit', function(e) {
     ui.addBookToList(book);
 
     // Success Alert
-    ui.showAlert('Book Added Successfully','success');
+    ui.showAlert("Book Added Successfully", "success");
 
     // Clear the fields
     ui.clearFields();
   }
+
+  e.preventDefault();
+});
+
+// Event Listeners for the Delete book
+document.querySelector("#book-list").addEventListener("click", function(e) {
+  const ui = new UI();
+
+  // Delete Book
+  ui.deleteBook(e.target);
+
+  // Show Success - Alert
+  ui.showAlert("Book Removed", "success");
 
   e.preventDefault();
 });
